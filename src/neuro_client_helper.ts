@@ -66,6 +66,7 @@ export interface RCEAction extends TypedAction {
  * Strips an action to the form expected by the API.
  * @param action The action to strip to its basic form.
  * @returns The action stripped to its basic form, without the handler and permissions.
+ * @see {@link Action} for the NeuroClient's Action type.
  */
 export function stripToAction(action: RCEAction): Action {
     return {
@@ -80,6 +81,7 @@ export function stripToAction(action: RCEAction): Action {
  * (Calls {@link stripToAction} for each action in the array.)
  * @param actions The actions to strip to their basic form.
  * @returns An array of actions stripped to their basic form, without the handler and permissions.
+ * @see {@link Action} for the NeuroClient's Action type.
  */
 export function stripToActions(actions: RCEAction[]): Action[] {
     return actions.map(stripToAction);
@@ -106,16 +108,16 @@ export function actionValidationAccept(message?: string): ActionValidationResult
  * loop in case the action is not applicable in the current state.
  * @param message The message to send to Neuro.
  * This should explain, if possible, why the action failed.
- * If omitted, will just send "Action failed.".
- * @param retry It's highly recommended you use {@link actionValidationRetry} instead.
+ * If omitted, will just send "Action validation failed.".
+ * @param retry - It's highly recommended you use {@link actionValidationRetry} instead.
  * @returns A successful action result with the specified message.
  */
-export function actionValidationFailure(message: string, retry = false): ActionValidationResult {
+export function actionValidationFailure(message: string): ActionValidationResult {
     logOutput('WARNING', 'Action failed: ' + message);
     return {
         success: false,
-        retry: retry,
-        message: message !== undefined ? `Action failed: ${message}` : 'Action failed.',
+        retry: false,
+        message: message !== undefined ? `Action validation failed: ${message}` : 'Action validation failed.',
     };
 }
 
@@ -142,11 +144,11 @@ export function contextFailure(message?: string, tag = 'WARNING'): string {
  * @returns A failed action result with the specified message.
  */
 export function actionValidationRetry(message: string): ActionValidationResult {
-    logOutput('WARNING', 'Action failed: ' + message + '\nRequesting retry.');
+    logOutput('WARNING', 'Action validation failed: ' + message + '\nRequesting retry.');
     return {
         success: false,
         retry: true,
-        message: 'Action failed: ' + message,
+        message: 'Action validation failed: ' + message + '\nPlease retry the action with the validation error in mind.',
     };
 }
 

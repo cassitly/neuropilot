@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { NEURO } from '@/constants';
 import { normalizePath, getWorkspacePath, logOutput, isPathNeuroSafe, getWorkspaceUri } from '@/utils';
 import { PERMISSIONS, getPermissionLevel, CONFIG, isActionEnabled } from '@/config';
-import { ActionData, actionValidationAccept, actionValidationFailure, ActionValidationResult, RCEAction, contextFailure, stripToActions } from '@/neuro_client_helper';
+import { ActionData, actionValidationAccept, actionValidationFailure, ActionValidationResult, RCEAction, contextFailure, stripToActions, actionValidationRetry } from '@/neuro_client_helper';
 import assert from 'node:assert';
 import { targetedFileLintingResolvedEvent, targetedFolderLintingResolvedEvent, workspaceLintingResolvedEvent } from '@events/linting';
 
@@ -14,7 +14,7 @@ import { targetedFileLintingResolvedEvent, targetedFolderLintingResolvedEvent, w
  */
 async function validatePath(path: string, directoryType: string): Promise<ActionValidationResult> {
     if (path === '') {
-        return actionValidationFailure('No file path specified.', true);
+        return actionValidationRetry('No file path specified.');
     };
     const workspaceUri = getWorkspaceUri();
     if (!workspaceUri) {
